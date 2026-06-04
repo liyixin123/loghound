@@ -76,7 +76,7 @@ impl Default for LogConfig {
         Self {
             dir: default_log_dir(),
             file_prefix: "loghound".to_string(),
-            max_days: 7,
+            max_days: 15,
             line_format: "{time} [{pid} {process}] {message}".to_string(),
         }
     }
@@ -200,7 +200,7 @@ mod tests {
         let c: Config = toml::from_str(toml).unwrap();
         assert_eq!(c.filter.process_names, vec!["a.exe".to_string()]);
         // log 段缺失时应使用默认值
-        assert_eq!(c.log.max_days, 7);
+        assert_eq!(c.log.max_days, 15);
     }
 
     #[test]

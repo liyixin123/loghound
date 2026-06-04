@@ -7,7 +7,7 @@ dir = "C:\\ProgramData\\loghound\\logs"
 # 日志文件名前缀，实际文件形如 loghound.2026-06-04
 file_prefix = "loghound"
 # 最多保留天数（按天滚动，超过的旧文件自动删除），必须 >= 1
-max_days = 7
+max_days = 15
 # 单行格式，占位符：{time} {pid} {process} {message}
 line_format = "{time} [{pid} {process}] {message}"
 
