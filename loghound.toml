@@ -1,0 +1,18 @@
+# loghound 配置文件
+# 放在与 loghound.exe 同目录。修改后需重启服务/程序生效。
+
+[log]
+# 日志输出目录
+dir = "C:\\ProgramData\\loghound\\logs"
+# 日志文件名前缀，实际文件形如 loghound.2026-06-04
+file_prefix = "loghound"
+# 最多保留天数（按天滚动，超过的旧文件自动删除），必须 >= 1
+max_days = 7
+# 单行格式，占位符：{time} {pid} {process} {message}
+line_format = "{time} [{pid} {process}] {message}"
+
+[filter]
+# 仅采集这些进程名的调试输出（不区分大小写）。留空 [] 表示采集全部。
+process_names = ["ISVCommServer.exe"]
+# 额外按 PID 过滤（一般留空，进程名更实用）
+pids = []
