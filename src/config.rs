@@ -29,7 +29,7 @@ pub enum ConfigError {
 }
 
 /// 顶层配置。
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Config {
     #[serde(default)]
     pub log: LogConfig,
@@ -78,15 +78,6 @@ impl Default for LogConfig {
             file_prefix: "loghound".to_string(),
             max_days: 15,
             line_format: "{time} [{pid} {process}] {message}".to_string(),
-        }
-    }
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            log: LogConfig::default(),
-            filter: FilterConfig::default(),
         }
     }
 }
