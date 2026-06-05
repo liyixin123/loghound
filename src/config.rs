@@ -22,14 +22,14 @@ pub enum ConfigError {
     #[error("解析配置文件失败 {path}: {source}")]
     Parse {
         path: PathBuf,
-        source: toml::de::Error,
+        source: Box<toml::de::Error>,
     },
     #[error("配置校验失败: {0}")]
     Invalid(String),
 }
 
 /// 顶层配置。
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Config {
     #[serde(default)]
     pub log: LogConfig,
@@ -82,15 +82,6 @@ impl Default for LogConfig {
     }
 }
 
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            log: LogConfig::default(),
-            filter: FilterConfig::default(),
-        }
-    }
-}
-
 /// 默认日志目录。Windows 下用 ProgramData，其它平台用临时目录（便于在非 Windows 上测试）。
 fn default_log_dir() -> PathBuf {
     #[cfg(windows)]
@@ -114,11 +105,10 @@ impl Config {
                 path: path.to_path_buf(),
                 source,
             })?;
-            let config: Config =
-                toml::from_str(&text).map_err(|source| ConfigError::Parse {
-                    path: path.to_path_buf(),
-                    source,
-                })?;
+            let config: Config = toml::from_str(&text).map_err(|source| ConfigError::Parse {
+                path: path.to_path_buf(),
+                source: Box::new(source),
+            })?;
             config.validate()?;
             Ok(config)
         } else {
@@ -147,14 +137,10 @@ impl Config {
     /// 校验配置合法性，fail-fast。
     pub fn validate(&self) -> Result<(), ConfigError> {
         if self.log.max_days == 0 {
-            return Err(ConfigError::Invalid(
-                "log.max_days 必须 >= 1".to_string(),
-            ));
+            return Err(ConfigError::Invalid("log.max_days 必须 >= 1".to_string()));
         }
         if self.log.file_prefix.trim().is_empty() {
-            return Err(ConfigError::Invalid(
-                "log.file_prefix 不能为空".to_string(),
-            ));
+            return Err(ConfigError::Invalid("log.file_prefix 不能为空".to_string()));
         }
         Ok(())
     }

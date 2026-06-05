@@ -27,17 +27,17 @@ pub enum Poll {
 
 #[cfg(windows)]
 mod imp {
-    use super::{DbwinMonitor, Poll, BUFFER_SIZE};
+    use super::{BUFFER_SIZE, DbwinMonitor, Poll};
     use crate::capture::decode::decode_message;
 
-    use windows::core::PCWSTR;
     use windows::Win32::Foundation::{
-        CloseHandle, GetLastError, ERROR_ALREADY_EXISTS, INVALID_HANDLE_VALUE, WAIT_OBJECT_0,
+        CloseHandle, ERROR_ALREADY_EXISTS, GetLastError, INVALID_HANDLE_VALUE, WAIT_OBJECT_0,
     };
     use windows::Win32::System::Memory::{
-        CreateFileMappingW, MapViewOfFile, UnmapViewOfFile, FILE_MAP_READ, PAGE_READWRITE,
+        CreateFileMappingW, FILE_MAP_READ, MapViewOfFile, PAGE_READWRITE, UnmapViewOfFile,
     };
     use windows::Win32::System::Threading::{CreateEventW, SetEvent, WaitForSingleObject};
+    use windows::core::PCWSTR;
 
     fn wide(s: &str) -> Vec<u16> {
         s.encode_utf16().chain(std::iter::once(0)).collect()

@@ -13,7 +13,7 @@ pub fn decode_message(raw: &[u8]) -> String {
 /// 按系统 ANSI 代码页（CP_ACP）把字节解码为 UTF-8。
 #[cfg(windows)]
 fn decode_ansi(bytes: &[u8]) -> String {
-    use windows::Win32::Globalization::{MultiByteToWideChar, MULTI_BYTE_TO_WIDE_CHAR_FLAGS};
+    use windows::Win32::Globalization::{MULTI_BYTE_TO_WIDE_CHAR_FLAGS, MultiByteToWideChar};
 
     const CP_ACP: u32 = 0;
     if bytes.is_empty() {
@@ -72,16 +72,15 @@ mod tests {
         assert_eq!(decode_message(b"\0"), "");
     }
 
-    // GBK 中文解码依赖系统代码页，仅在 Windows 上验证。
+    // GBK 中文解码依赖系统代码页，仅在 CP936（中文 GBK）Windows 上验证。
     #[cfg(windows)]
     #[test]
     fn decodes_gbk_chinese_on_windows() {
-        // “中文” 的 GBK 编码字节
-        let gbk = [0xD6u8, 0xD0, 0xCE, 0xC4];
-        let decoded = decode_message(&gbk);
-        // 在中文系统上应解出“中文”；非中文代码页系统跳过断言
-        if decoded != String::from_utf8_lossy(&gbk) {
-            assert_eq!(decoded, "中文");
+        use windows::Win32::Globalization::GetACP;
+        if unsafe { GetACP() } != 936 {
+            return; // 非中文代码页环境，跳过
         }
+        let gbk = [0xD6u8, 0xD0, 0xCE, 0xC4]; // "中文" 的 GBK 编码
+        assert_eq!(decode_message(&gbk), "中文");
     }
 }
