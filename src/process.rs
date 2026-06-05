@@ -37,10 +37,10 @@ impl<L: ProcessNameLookup> ProcessNameCache<L> {
     }
 
     fn insert(&mut self, pid: u32, name: Option<String>) {
-        if self.map.len() >= self.capacity {
-            if let Some(oldest) = self.order.pop_front() {
-                self.map.remove(&oldest);
-            }
+        if self.map.len() >= self.capacity
+            && let Some(oldest) = self.order.pop_front()
+        {
+            self.map.remove(&oldest);
         }
         self.map.insert(pid, name);
         self.order.push_back(pid);

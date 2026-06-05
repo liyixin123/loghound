@@ -22,7 +22,7 @@ pub enum ConfigError {
     #[error("解析配置文件失败 {path}: {source}")]
     Parse {
         path: PathBuf,
-        source: toml::de::Error,
+        source: Box<toml::de::Error>,
     },
     #[error("配置校验失败: {0}")]
     Invalid(String),
@@ -116,7 +116,7 @@ impl Config {
             })?;
             let config: Config = toml::from_str(&text).map_err(|source| ConfigError::Parse {
                 path: path.to_path_buf(),
-                source,
+                source: Box::new(source),
             })?;
             config.validate()?;
             Ok(config)
