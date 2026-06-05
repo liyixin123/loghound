@@ -1,5 +1,7 @@
 # loghound
 
+[![CI](https://github.com/liyixin123/loghound/actions/workflows/ci.yml/badge.svg)](https://github.com/liyixin123/loghound/actions/workflows/ci.yml)
+
 一个轻量级的 Windows 调试日志采集服务，用于捕获用户态 `OutputDebugString` 输出并持久化到本地文件。
 
 > **DbgView** 是 Sysinternals 著名的调试输出查看工具，但它需要人工值守且日志难以长期归档。`loghound` 在此基础上提供了**无人值守、自动轮转、按需过滤、开机自启**等能力，适合生产环境持续采集特定进程的调试日志。
