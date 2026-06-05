@@ -13,7 +13,7 @@ pub fn decode_message(raw: &[u8]) -> String {
 /// 按系统 ANSI 代码页（CP_ACP）把字节解码为 UTF-8。
 #[cfg(windows)]
 fn decode_ansi(bytes: &[u8]) -> String {
-    use windows::Win32::Globalization::{MultiByteToWideChar, MULTI_BYTE_TO_WIDE_CHAR_FLAGS};
+    use windows::Win32::Globalization::{MULTI_BYTE_TO_WIDE_CHAR_FLAGS, MultiByteToWideChar};
 
     const CP_ACP: u32 = 0;
     if bytes.is_empty() {

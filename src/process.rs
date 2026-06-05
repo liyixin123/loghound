@@ -56,8 +56,8 @@ impl ProcessNameLookup for WinProcessLookup {
     fn lookup(&self, pid: u32) -> Option<String> {
         use windows::Win32::Foundation::CloseHandle;
         use windows::Win32::System::Threading::{
-            OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_WIN32,
-            PROCESS_QUERY_LIMITED_INFORMATION,
+            OpenProcess, PROCESS_NAME_WIN32, PROCESS_QUERY_LIMITED_INFORMATION,
+            QueryFullProcessImageNameW,
         };
         use windows::core::PWSTR;
 
@@ -110,10 +110,7 @@ pub fn platform_lookup() -> PlatformLookup {
 
 /// 从完整路径中取出文件名部分（兼容 `\` 与 `/` 分隔符）。
 fn file_name_of(path: &str) -> String {
-    path.rsplit(['\\', '/'])
-        .next()
-        .unwrap_or(path)
-        .to_string()
+    path.rsplit(['\\', '/']).next().unwrap_or(path).to_string()
 }
 
 #[cfg(test)]

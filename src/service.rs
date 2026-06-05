@@ -131,8 +131,7 @@ mod windows_impl {
             account_name: None, // LocalSystem
             account_password: None,
         };
-        let service =
-            manager.create_service(&service_info, ServiceAccess::CHANGE_CONFIG)?;
+        let service = manager.create_service(&service_info, ServiceAccess::CHANGE_CONFIG)?;
         service.set_description(SERVICE_DISPLAY)?;
         println!("已注册服务 \"{SERVICE_NAME}\"。可用 `sc start {SERVICE_NAME}` 启动。");
         Ok(())
