@@ -55,16 +55,16 @@ sc start loghound
 
 > **⚠️ 重要限制**：服务运行在 Session 0，而纯用户态 `DBWIN` 机制**无法跨会话**。因此服务模式下**只能采集到同样运行在 Session 0 的其他服务进程**的 `OutputDebugString`，**无法捕获桌面交互式应用的日志**。采集桌面应用请使用控制台模式。
 
-### 方式三：登录启动计划任务（附赠脚本）
+### 方式三：登录启动计划任务（附赠脚本，推荐桌面自启动）
 
 如果 Windows 服务模式的 Session 0 限制不符合你的场景，但又希望开机自启，可以使用仓库附带的脚本：
 
 ```powershell
-# 在项目 dist/loghound/ 目录（或 scripts/）下：
+# 从发布包解压后，或在源码 scripts/ 目录下：
 右键 install.bat → 以管理员身份运行
 ```
 
-这将注册一个**登录时启动的计划任务**，并在后台隐藏运行 `loghound`（使用 `run-hidden.vbs`），从而采集当前桌面会话中的调试输出。卸载时运行 `uninstall.bat`。
+这将注册一个**登录时启动的计划任务**，loghound 以登录用户身份后台隐藏运行在**交互式桌面会话（Session 1）**，与控制台模式具有相同的采集范围——可捕获当前会话中所有桌面应用的 `OutputDebugString`。卸载时运行 `uninstall.bat`。
 
 ---
 
@@ -138,10 +138,13 @@ pids = []
 loghound/
 ├── Cargo.toml           # Rust 项目配置
 ├── loghound.toml        # 默认配置文件示例
+├── package.bat          # 一键打包脚本（调用 scripts/package.ps1）
+├── README.txt           # 发行包随附的极简说明
 ├── scripts/
 │   ├── install.bat      # 计划任务安装脚本（登录自启动）
 │   ├── uninstall.bat    # 计划任务卸载脚本
-│   └── run-hidden.vbs   # 后台隐藏运行辅助脚本
+│   ├── run-hidden.vbs   # 后台隐藏运行辅助脚本（由计划任务调用）
+│   └── package.ps1      # 打包逻辑：编译 → 整理文件 → 压缩 zip
 ├── src/
 │   ├── main.rs          # 程序入口：命令行解析与模式分发
 │   ├── cli.rs           # 命令行参数定义（clap）
@@ -185,7 +188,7 @@ cargo test
 
 ## 使用建议
 
-1. **桌面应用日志采集**：直接在目标会话下用控制台模式运行 `loghound`，配合 `run-hidden.vbs` 隐藏窗口。
+1. **桌面应用日志采集**：使用 `install.bat` 注册计划任务（推荐，开机自启、后台隐藏运行，运行在 Session 1）；临时采集可直接在目标会话下运行控制台模式。两种方式均在用户交互会话中运行，均可采集桌面应用的 `OutputDebugString`。
 2. **纯后台服务日志采集**：若目标进程本身就是 Windows 服务（运行在 Session 0），可使用 `loghound.exe install` 注册系统服务。
 3. **避免与 DbgView 同时运行**：`DBWIN` 机制只允许同一会话中**一个**采集方存在。如果 DbgView 或其它同类工具已运行，`loghound` 会报告冲突并退出。
 4. **权限**：普通用户权限即可运行。安装 Windows 服务需要管理员权限。
